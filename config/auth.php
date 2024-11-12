@@ -35,12 +35,17 @@ return [
     |
     */
 
-    'guards' => [
-        'web' => [
-            'driver' => 'session',
-            'provider' => 'users',
-        ],
+   'guards' => [
+    'web' => [
+        'driver' => 'session',
+        'provider' => 'users',
     ],
+
+    'api' => [
+        'driver' => 'passport',
+        'provider' => 'users',
+    ],
+],
 
     /*
     |--------------------------------------------------------------------------
@@ -63,6 +68,7 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\User::class),
+            App\Providers\AuthServiceProvider::class,
         ],
 
         // 'users' => [
