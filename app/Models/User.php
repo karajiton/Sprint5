@@ -23,7 +23,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'registered_at'
     ];
+    protected $dates = ['registered_at'];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -46,5 +48,9 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+    public function games()
+    {
+        return $this->hasMany(Game::class);
     }
 }
