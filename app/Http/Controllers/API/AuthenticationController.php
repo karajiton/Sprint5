@@ -9,7 +9,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-
+use Illuminate\Support\Facades\Log;
 
 
 class AuthenticationController extends Controller
@@ -56,8 +56,8 @@ class AuthenticationController extends Controller
 
             if (Auth::attempt(['email' => $email,'password' => $password])) 
             {
-                $user = Auth::User();
-                $accessToken = $user->createToken($user->email)->accessToken;
+                $user = Auth::user();
+                $accessToken = $user->createToken('token')->accessToken;
     
                 $data = [];
                 $data['response_code'] = '200';
@@ -74,7 +74,7 @@ class AuthenticationController extends Controller
                 return response()->json($data);
             }
         } catch(\Exception $e) {
-            \Log::info($e);
+            Log::info($e);
             $data = [];
             $data['response_code']  = '401';
             $data['status']         = 'error';
@@ -95,7 +95,7 @@ class AuthenticationController extends Controller
             $data['data_user_list'] = $userDataList;
             return response()->json($data);
         } catch(\Exception $e) {
-            \Log::info($e);
+            Log::info($e);
             $data = [];
             $data['response_code']  = '400';
             $data['status']         = 'error';

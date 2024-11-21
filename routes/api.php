@@ -1,10 +1,11 @@
 <?php
 
+use Illuminate\Http\Request;
 use App\Http\Controllers\API\AuthenticationController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PlayerController;
 
-
+Route::post("register", [AuthenticationController::class, "register"]);
 Route::middleware('auth:api')->group(function () {
 Route::post('/players', [PlayerController::class, 'createPlayer']);
 Route::put('/players/{id}', [PlayerController::class, 'updatePlayer']);
@@ -17,7 +18,7 @@ Route::get('/players/ranking/loser', [PlayerController::class, 'worstPlayer']);
 Route::get('/players/ranking/winner', [PlayerController::class, 'bestPlayer']);
 });
 
-Route::group(['namespace' => 'App\Http\Controllers\API'],function()
+/*Route::group(['namespace' => 'App\Http\Controllers\API'],function()
 {
     // --------------- register and login ----------------//
     Route::controller(AuthenticationController::class)->group(function () {
