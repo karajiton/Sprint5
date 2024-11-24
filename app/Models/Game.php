@@ -8,10 +8,10 @@ class Game extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['player_id', 'dice_one', 'dice_two', 'win'];
+    protected $fillable = ['user_id', 'dice_one', 'dice_two', 'win'];
 
     public function player()
     {
-        return $this->belongsTo(Player::class);
+        return $this->belongsTo(User::class);
     }
 }

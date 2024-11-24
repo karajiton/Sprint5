@@ -1,62 +1,62 @@
 <?php
 
-namespace App\Http\Controllers;
-use app\Models\Player;
-use app\Models\Game;
+namespace App\Http\Controllers\API;
+use App\Models\User;
+use App\Models\Game;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 class PlayerController extends Controller
 {
     public function createPlayer(Request $request){
-        $request->validate(['nickName' => 'required|string']);
-        $player = Player::create(['nickName' => $request->nickName]);
-        return response()->json($player, 201);
+        $request->validate(['name' => 'required|string']);
+        $user = User::create(['name' => $request->name]);
+        return response()->json($user, 201);
     }
     public function updatePlayer(Request $request, $id){
-        $player = Player::findOrFail($id);
-        $request->validate(['nickName' => 'required|string']);
-        $player->update(['nickName' => $request->nickName]);
-        return response()->json($player);
+        $user = User::findOrFail($id);
+        $request->validate(['name' => 'required|string']);
+        $user->update(['name' => $request->name]);
+        return response()->json($user);
     }
     public function rollDice($id){
-        $player = Player::findOrFail($id);
+        $user = User::findOrFail($id);
         $diceOne = rand(1, 6);
         $diceTwo = rand(1, 6); 
         $win = $diceOne + $diceTwo == 7; 
-        $game = Game::create(['player_id' => $id, 'dice_one' => $diceOne, 'dice_two' => $diceTwo, 'win' => $win]);
+        $game = Game::create(['user_id' => $id, 'dice_one' => $diceOne, 'dice_two' => $diceTwo, 'win' => $win]);
 
         
-        $totalGames = $player->games()->count();
-        $totalWins = $player->games()->where('win', true)->count();
-        $player->success_rate = $totalGames ? ($totalWins / $totalGames) * 100 : 0;
-        $player->save();
+        $totalGames = $user->games()->count();
+        $totalWins = $user->games()->where('win', true)->count();
+        $user->success_rate = $totalGames ? ($totalWins / $totalGames) * 100 : 0;
+        $user->save();
 
         return response()->json($game, 201);
     }
     public function deleteGames($id){
-        $player = Player::findOrFail($id);
-        $player->games()->delete();
-        $player->success_rate = 0; // Reiniciar porcentaje de éxito
-        $player->save();
+        $user = User::findOrFail($id);
+        $user->games()->delete();
+        $user->success_rate = 0; // Reiniciar porcentaje de éxito
+        $user->save();
 
         return response()->json(['message' => 'Tiradas eliminadas']);
     }
     public function listPlayers(){
-        return Player::all();
+        return User::all();
     }
     public function listGames($id){
-        $player = Player::findOrFail($id);
-        return $player->games;
+        $user = User::findOrFail($id);
+        return $user->games;
     }
     public function ranking(){
-        return Player::orderByDesc('success_rate')->get();
+        return User::orderByDesc('success_rate')->get();
     }
     public function worstPlayer(){
-        return Player::orderBy('success_rate')->first();
+        return User::orderBy('success_rate')->first();
     }
     public function bestPlayer(){
-        return Player::orderByDesc('success_rate')->first();
+        return User::orderByDesc('success_rate')->first();
     }
 }
 

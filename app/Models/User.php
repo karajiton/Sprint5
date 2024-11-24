@@ -23,6 +23,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'success_rate',
         'registered_at'
     ];
     protected $dates = ['registered_at'];

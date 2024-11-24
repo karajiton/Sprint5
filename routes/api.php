@@ -1,10 +1,11 @@
 <?php
 
+use Illuminate\Http\Request;
 use App\Http\Controllers\API\AuthenticationController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\PlayerController;
+use App\Http\Controllers\API\PlayerController;
 
-
+Route::post("register", [AuthenticationController::class, "register"]);
 Route::middleware('auth:api')->group(function () {
 Route::post('/players', [PlayerController::class, 'createPlayer']);
 Route::put('/players/{id}', [PlayerController::class, 'updatePlayer']);
