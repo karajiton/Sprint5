@@ -18,7 +18,7 @@ Route::get('/players/ranking/loser', [PlayerController::class, 'worstPlayer']);
 Route::get('/players/ranking/winner', [PlayerController::class, 'bestPlayer']);
 });
 
-/*Route::group(['namespace' => 'App\Http\Controllers\API'],function()
+Route::group(['namespace' => 'App\Http\Controllers\API'],function()
 {
     // --------------- register and login ----------------//
     Route::controller(AuthenticationController::class)->group(function () {

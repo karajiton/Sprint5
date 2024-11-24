@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Controllers\Controller;
+use app\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
-use App\Models\User;
+use app\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;

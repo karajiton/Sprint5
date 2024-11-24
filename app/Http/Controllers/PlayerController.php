@@ -1,8 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
-use app\Models\Player;
-use app\Models\Game;
+use App\Models\Player;
+use App\Models\Game;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
