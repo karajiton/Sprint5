@@ -5,23 +5,22 @@ namespace Database\Seeders;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 class DatabaseSeeder extends Seeder
 {
-    
-    /**
-     * Seed the application's database.
-     */
-    public function run(): void
+    public function run()
     {
-        // User::factory(10)->create();
+        // Crear roles con el guard 'api'
+        $admin = Role::create(['name' => 'admin', 'guard_name' => 'api']);
+        $player = Role::create(['name' => 'player', 'guard_name' => 'api']);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
-        $this->call(RolesAndPermissionsSeeder::class);
+        // Crear permisos con el guard 'api'
+        Permission::create(['name' => 'manage games', 'guard_name' => 'api']);
+        Permission::create(['name' => 'play games', 'guard_name' => 'api']);
 
+        // Asignar permisos a roles
+        $admin->givePermissionTo(['manage games', 'play games']);
+        $player->givePermissionTo(['play games']);
     }
-    
 }

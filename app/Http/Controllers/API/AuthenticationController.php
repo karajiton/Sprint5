@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\API;
 
-use app\Http\Controllers\Controller;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
-use app\Models\User;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -18,10 +18,17 @@ class AuthenticationController extends Controller
     public function register(Request $request)
     {
         $request->validate([
-            'name'     => 'required|min:4',
+            'name'     => 'required|string',
             'email'    => 'required|string|email|max:255|unique:users',
             'password' => 'required|min:8',
         ]);
+       
+        $name = $request->name ?? 'anonimo';
+        if($name !== 'anonimo') {
+            $request->validate([
+                'name' => 'unique:users,name',
+            ]);
+        }
  
         $dt        = Carbon::now();
         $join_date = $dt->toDayDateTimeString();
@@ -31,12 +38,12 @@ class AuthenticationController extends Controller
         $user->email        = $request->email;
         $user->password     = Hash::make($request->password);
         $user->save();
-
+        $user->assignRole('player');
         $data = [];
         $data['response_code']  = '200';
         $data['status']         = 'success';
         $data['message']        = 'success Register';
-        return response()->json($data);
+        return response()->json($user);
     }
 
     /**
