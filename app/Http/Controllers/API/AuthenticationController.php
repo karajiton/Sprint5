@@ -42,44 +42,37 @@ class AuthenticationController extends Controller
     /**
      * Login Req
      */
-    public function login(Request $request)
-    {
+    public function login (Request $request){
         $request->validate([
-            'email'    => 'required|string',
-            'password' => 'required|string',
+            "email" => "required|email|string",
+            "password" => "required"
         ]);
 
-        try {
+        $user = User::where("email", $request->email)->first();
+        if(!empty($user)){
 
-            $email     = $request->email;
-            $password  = $request->password;
+            if(Hash::check($request->password, $user->password)){
 
-            if (Auth::attempt(['email' => $email,'password' => $password])) 
-            {
-                $user = Auth::user();
-                $accessToken = $user->createToken('token')->accessToken;
-    
-                $data = [];
-                $data['response_code'] = '200';
-                $data['status']        = 'success';
-                $data['message']       = 'success Login';
-                $data['user_info']     = $user;
-                $data['token']         = $accessToken;
-                return response()->json($data);
-            } else {
-                $data = [];
-                $data['response_code']  = '401';
-                $data['status']         = 'error';
-                $data['message']        = 'Unauthorized';
-                return response()->json($data);
+              $token = $user->createToken('myToken')->accessToken;
+                return response()->json([
+                    "status" => true,
+                    "message" => "Login succesful",
+                    "token" => $token,
+                    "data" => []
+                ],200);
+            }else{
+                return response()->json([
+                    "status" => false,
+                    "message" => "Password didn't match",
+                    "data" => []
+                ],401);
             }
-        } catch(\Exception $e) {
-            Log::info($e);
-            $data = [];
-            $data['response_code']  = '401';
-            $data['status']         = 'error';
-            $data['message']        = 'fail Login';
-            return response()->json($data);
+        }else{
+            return response()->json([
+                "status" => false,
+                "message" => "invalid Email value",
+                "data" => []
+            ],401);
         }
     }
 
