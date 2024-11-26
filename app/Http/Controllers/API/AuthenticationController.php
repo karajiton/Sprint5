@@ -17,6 +17,7 @@ class AuthenticationController extends Controller
     /** register new account */
     public function register(Request $request)
     {
+       
         $request->validate([
             'name'     => 'required|string',
             'email'    => 'required|string|email|max:255|unique:users',
@@ -38,7 +39,7 @@ class AuthenticationController extends Controller
         $user->email        = $request->email;
         $user->password     = Hash::make($request->password);
         $user->save();
-        $user->assignRole('player','api');
+        $user->assignRole();
         $data = [];
         $data['response_code']  = '200';
         $data['status']         = 'success';
