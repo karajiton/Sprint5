@@ -8,8 +8,7 @@ use App\Http\Controllers\API\PlayerController;
 Route::post("register", [AuthenticationController::class, "register"]);
 Route::post("login", [AuthenticationController::class, "login"]);
 Route::middleware('auth:api')->group(function () {
-Route::post('/players', [PlayerController::class, 'createPlayer']);
-Route::put('/players/{id}', [PlayerController::class, 'updatePlayer']);
+Route::put('/players/{id}', [AuthenticationController::class, 'updatePlayer']);
 Route::post('/players/{id}/games', [PlayerController::class, 'rollDice']);
 Route::delete('/players/{id}/games', [PlayerController::class, 'deleteGames']);
 Route::get('/players/{id}/games', [PlayerController::class, 'listGames']);

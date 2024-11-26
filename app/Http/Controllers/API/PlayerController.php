@@ -9,12 +9,7 @@ use Illuminate\Http\Request;
 class PlayerController extends Controller
 {
     
-    public function updatePlayer(Request $request, $id){
-        $user = User::findOrFail($id);
-        $request->validate(['name' => 'required|string']);
-        $user->update(['name' => $request->name]);
-        return response()->json($user);
-    }
+    
     public function rollDice($id){
         $user = User::findOrFail($id);
         $diceOne = rand(1, 6);

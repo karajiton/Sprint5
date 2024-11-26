@@ -104,4 +104,10 @@ class AuthenticationController extends Controller
             return response()->json($data);
         }
     }
+    public function updatePlayer(Request $request, $id){
+        $user = User::findOrFail($id);
+        $request->validate(['name' => 'required|string']);
+        $user->update(['name' => $request->name]);
+        return response()->json($user);
+    }
 }
