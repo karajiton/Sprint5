@@ -38,7 +38,7 @@ class AuthenticationController extends Controller
         $user->email        = $request->email;
         $user->password     = Hash::make($request->password);
         $user->save();
-        $user->assignRole('player');
+        $user->assignRole('player','api');
         $data = [];
         $data['response_code']  = '200';
         $data['status']         = 'success';
