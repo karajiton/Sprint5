@@ -134,4 +134,69 @@ class AuthenticationTest extends TestCase
             'name' => 'anonimo',
         ]);
     }
+    public function test_login_successful()
+{
+    // Crear un usuario de prueba
+    $user = User::factory()->create([
+        'email' => 'testuser@example.com',
+        'password' => bcrypt('password123'),
+    ]);
+
+    // Enviar solicitud de login
+    $response = $this->postJson('/api/login', [
+        'email' => 'testuser@example.com',
+        'password' => 'password123',
+    ]);
+
+    // Verificar que la respuesta tiene un código 200 y contiene el token
+    $response->assertStatus(200)
+        ->assertJsonStructure([
+            'message',
+            'token',
+            'user' => [
+                'id',
+                'name',
+                'email',
+                'created_at',
+                'updated_at',
+            ],
+        ]);
+    }
+    public function test_login_validation_error()
+    {
+    // Enviar solicitud con datos incompletos
+    $response = $this->postJson('api/login', [
+        'email' => '',
+        'password' => '',
+    ]);
+
+    // Verificar que la respuesta tiene un código 422 y errores de validación
+    $response->assertStatus(422)
+        ->assertJsonValidationErrors(['email', 'password']);
+    }
+    public function test_login_invalid_credentials()
+    {
+    // Crear un usuario de prueba
+    $user = User::factory()->create([
+        'email' => 'testuser@example.com',
+        'password' => bcrypt('password123'),
+    ]);
+
+    // Enviar solicitud de login con credenciales incorrectas
+    $response = $this->postJson('/api/login', [
+        'email' => 'testuser@example.com',
+        'password' => 'wrongpassword',
+    ]);
+
+    // Verificar que la respuesta tiene un código 401 y el mensaje esperado
+    $response->assertStatus(401)
+        ->assertJson([
+            'message' => 'Invalid credentials',
+        ]);
+    }
+    
+    
+    
+    
+
 }

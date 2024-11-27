@@ -64,22 +64,23 @@ class AuthenticationController extends Controller
                 return response()->json([
                     "status" => true,
                     "message" => "Login succesful",
-                    "token" => $token,
-                    "data" => []
-                ],200);
+                    'token' => $token,
+                    'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'created_at' => $user->created_at,
+                    'updated_at' => $user->updated_at,
+                    ],
+                    
+                    ],200);
             }else{
                 return response()->json([
-                    "status" => false,
-                    "message" => "Password didn't match",
-                    "data" => []
-                ],401);
+                    'status' => false,
+                    'message' => 'Invalid credentials', 
+                    'data' => [],
+                ], 401);
             }
-        }else{
-            return response()->json([
-                "status" => false,
-                "message" => "invalid Email value",
-                "data" => []
-            ],401);
         }
     }
 
