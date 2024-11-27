@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\API;
 
-use app\Http\Controllers\Controller;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
-use app\Models\User;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -17,26 +17,33 @@ class AuthenticationController extends Controller
     /** register new account */
     public function register(Request $request)
     {
+       
         $request->validate([
-            'name'     => 'required|min:4',
             'email'    => 'required|string|email|max:255|unique:users',
             'password' => 'required|min:8',
         ]);
- 
-        $dt        = Carbon::now();
-        $join_date = $dt->toDayDateTimeString();
-
+        
+        $name = $request->name ?? 'anonimo';
+        
+        if ($name !== 'anonimo') {
+            $request->validate([
+                'name' => 'string|unique:users,name',
+            ]);
+        }
+        
+        // Crear el usuario
         $user = new User();
-        $user->name         = $request->name ;
-        $user->email        = $request->email;
-        $user->password     = Hash::make($request->password);
+        $user->name     = $name; // Usa el nombre predeterminado o el proporcionado
+        $user->email    = $request->email;
+        $user->password = Hash::make($request->password);
         $user->save();
-
+        $user->save();
+        $user->assignRole('player');
         $data = [];
         $data['response_code']  = '200';
         $data['status']         = 'success';
         $data['message']        = 'success Register';
-        return response()->json($data);
+        return response()->json($user);
     }
 
     /**
@@ -95,5 +102,32 @@ class AuthenticationController extends Controller
             $data['message']        = 'fail get user list';
             return response()->json($data);
         }
+    }
+    public function updateUser(Request $request, $id)
+    {
+        
+        
+        // Validar los datos recibidos
+        $validatedData = $request->validate([
+            'name' => 'string|max:255',
+            'email' => 'email|unique:users,email,' . $id,
+            'password' => 'nullable|string|min:8',
+        ]);
+
+        // Encontrar al jugador por ID
+        $player = User::find($id);
+        if (!$player) {
+            return response()->json(['message' => 'Player not found'], 404);
+        }
+
+        // Actualizar los datos del jugador
+        $player->name = $validatedData['name'] ?? $player->name;
+        $player->email = $validatedData['email'] ?? $player->email;
+        if (isset($validatedData['password'])) {
+            $player->password = Hash::make($validatedData['password']);
+        }
+        $player->save();
+
+        return response()->json(['message' => 'Player updated successfully', 'player' => $player]);
     }
 }

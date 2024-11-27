@@ -12,13 +12,16 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
-    use HasApiTokens,HasRoles,Notifiable;
+    use HasFactory,HasApiTokens,HasRoles,Notifiable;
     /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
      */
+    //protected function getDefaultGuardName(): string { return 'api'; }
+   
+    protected string $guard_name = 'api';
+    
     protected $fillable = [
         'name',
         'email',

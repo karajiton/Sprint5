@@ -182,5 +182,8 @@ return [
          */
 
         'store' => 'default',
+        'defaults' => [
+    'guard_name' => 'api', // Cambia a 'api' si es el guard principal
+],
     ],
 ];
