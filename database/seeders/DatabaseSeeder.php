@@ -18,12 +18,8 @@ class DatabaseSeeder extends Seeder
         $player = Role::create(['name' => 'player', 'guard_name' => 'api']);
 
         // Crear permisos con el guard 'api'
-        Permission::create(['name' => 'manage games', 'guard_name' => 'api']);
-        Permission::create(['name' => 'play games', 'guard_name' => 'api']);
-
-        // Asignar permisos a roles
-        $admin->givePermissionTo(['manage games', 'play games']);
-        $player->givePermissionTo(['play games']);
+        Permission::create(['name' => 'manage games', 'guard_name' => 'api'])->syncRoles([$admin]);
+        Permission::create(['name' => 'play games', 'guard_name' => 'api'])->syncRoles([$admin,$player]);
          // Crear el usuario administrador
          $admind = User::firstOrCreate(
             ['email' => 'admin@example.com'],
