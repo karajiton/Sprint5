@@ -36,8 +36,9 @@ class AuthenticationController extends Controller
         $user->name     = $name; // Usa el nombre predeterminado o el proporcionado
         $user->email    = $request->email;
         $user->password = Hash::make($request->password);
-        $user->save();
         $user->assignRole('player');
+        $user->save();
+        
         $data = [];
         $data['response_code']  = '200';
         $data['status']         = 'success';
@@ -50,19 +51,19 @@ class AuthenticationController extends Controller
      */
     public function login (Request $request){
         $request->validate([
-            "email" => "required|email|string",
-            "password" => "required"
+            'email' => 'required|email|string',
+            'password' => 'required'
         ]);
 
-        $user = User::where("email", $request->email)->first();
+        $user = User::where('email', $request->email)->first();
         if(!empty($user)){
 
             if(Hash::check($request->password, $user->password)){
 
               $token = $user->createToken('myToken')->accessToken;
                 return response()->json([
-                    "status" => true,
-                    "message" => "Login succesful",
+                    'status' => true,
+                    'message' => 'Login succesful',
                     'token' => $token,
                     'user' => [
                     'id' => $user->id,
@@ -106,17 +107,17 @@ class AuthenticationController extends Controller
     public function updateUser(Request $request, $id)
     {
         
-     Log::info('Solicitud recibida para actualizar usuario', ['request' => $request->all(), 'user_id' => $id]);
-     $user = Auth::user();
+     //Log::info('Solicitud recibida para actualizar usuario', ['request' => $request->all(), 'user_id' => $id]);
+     //$user = Auth::user();
 
         $userToUpdate = User::findOrFail($id);
         $authUser = $request->user();
-
-        if ($authUser->id !== $userToUpdate->id) {
+        
+       if ($authUser->id !== $userToUpdate->id) {
             return response()->json([
-                "message" => "You cannot modify another user's name."
+                'message' => "You cannot modify another user's name."
             ], 403);
-        }
+        } 
         
         // Validar los datos recibidos
          $request->validate([

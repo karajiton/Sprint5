@@ -228,7 +228,21 @@ class AuthenticationTest extends TestCase
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['name']);
     }
-    
+    public function test_protected_route()
+{
+    $user = User::factory()->create();
+    $token = $user->createToken('TestToken')->accessToken;
+
+    $response = $this->withHeaders([
+        'Authorization' => 'Bearer ' . $token,
+    ])->getJson('/api/user');
+
+    $response->assertStatus(200)
+             ->assertJson([
+                 'id' => $user->id,
+                 'email' => $user->email,
+             ]);
+}
     
     
     
