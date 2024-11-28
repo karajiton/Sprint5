@@ -19,15 +19,9 @@ class AuthenticationTest extends TestCase
     {
         parent::setUp();
 
-        
-         // Run the migrations
-         Artisan::call('migrate');
-    
-         // Seed the database
-         Artisan::call('db:seed');
-     
-         // Create a personal access client for Passport without interaction
-         Artisan::call('passport:client', [
+        Artisan::call('migrate');
+        Artisan::call('db:seed');
+        Artisan::call('passport:client', [
              '--name' => 'TestClient',
              '--no-interaction' => true,
              '--personal' => true
@@ -49,12 +43,6 @@ class AuthenticationTest extends TestCase
          ]);
          $this->adminUser->assignRole('admin');
      }
- 
-    
-
-    /**
-     * Test para registrar un nuevo usuario exitosamente.
-     */
     public function test_register_new_user_successfully()
     {
         $this->withoutExceptionHandling();
@@ -64,7 +52,6 @@ class AuthenticationTest extends TestCase
             'password' => 'password123',
         ]);
 
-        
         $response->assertStatus(200)
             ->assertJsonStructure([
                 'id',
@@ -84,10 +71,6 @@ class AuthenticationTest extends TestCase
         $this->assertTrue($user->hasRole('player'));
         
     }
-
-    /**
-     * Test para verificar validaciones de entrada faltantes.
-     */
     public function test_register_user_validation_error()
     {
         $response = $this->postJson('/api/register', [
@@ -98,10 +81,6 @@ class AuthenticationTest extends TestCase
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['password', 'email']);
     }
-
-    /**
-     * Test para verificar que no se permite el registro con un nombre duplicado.
-     */
     public function test_register_with_duplicate_name()
     {
         User::factory()->create(['name' => 'DuplicateName', 'email' => 'duplicate@example.com']);
@@ -115,10 +94,6 @@ class AuthenticationTest extends TestCase
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['name']);
     }
-
-    /**
-     * Test para verificar que se puede registrar como anónimo.
-     */
     public function test_register_as_anonymous_user()
     {
         $response = $this->postJson('/api/register', [
@@ -193,6 +168,65 @@ class AuthenticationTest extends TestCase
         ->assertJson([
             'message' => 'Invalid credentials',
         ]);
+    }
+    public function test_update_user_successfully()
+    {
+        // Crear un usuario de prueba
+        $user = User::factory()->create([
+            'email' => 'original@example.com',
+            'password' => bcrypt('password123'),
+        ]);
+        $authUser = User::factory()->create();
+        $token = $user->createToken('TestToken')->accessToken;
+    
+        // Enviar solicitud de actualización
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->putJson("/api/players/{$user->id}", [
+            'name' => 'Updated Name',
+            
+        ]);
+    
+        // Verificar que la respuesta es exitosa
+        $response->assertStatus(200)
+            ->assertJson([
+                'status' => true,
+                'message' => 'User updated successfully',
+            ]);
+    
+        // Verificar que los datos se actualizaron en la base de datos
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'name' => 'Updated Name',
+        ]);
+    }
+        public function test_update_user_not_found()
+        {
+        $response = $this->putJson('/api/players/99', [
+            'name' => 'Nonexistent User',
+        ]);
+
+        $response->assertStatus(404)
+            ->assertJson([
+                'status' => false,
+                'message' => 'User not found',
+            ]);
+    }
+        public function test_update_user_with_existing_name()
+    {
+        // Crear dos usuarios de prueba
+        $user1 = User::factory()->create(['name' => 'ramon']);
+        $user2 = User::factory()->create(['name' => 'loco']);
+     $authUser = User::factory()->create();
+    $token = $authUser->createToken('TestToken')->accessToken;
+
+    $response = $this->withHeaders([
+        'Authorization' => 'Bearer ' . $token,
+    ])->putJson("/api/players/{$authUser->id}", [
+        'name' => 'loco',
+    ]);
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['name']);
     }
     
     

@@ -37,7 +37,6 @@ class AuthenticationController extends Controller
         $user->email    = $request->email;
         $user->password = Hash::make($request->password);
         $user->save();
-        $user->save();
         $user->assignRole('player');
         $data = [];
         $data['response_code']  = '200';
@@ -107,28 +106,42 @@ class AuthenticationController extends Controller
     public function updateUser(Request $request, $id)
     {
         
+     Log::info('Solicitud recibida para actualizar usuario', ['request' => $request->all(), 'user_id' => $id]);
+     $user = Auth::user();
+
+        $userToUpdate = User::findOrFail($id);
+        $authUser = $request->user();
+
+        if ($authUser->id !== $userToUpdate->id) {
+            return response()->json([
+                "message" => "You cannot modify another user's name."
+            ], 403);
+        }
         
         // Validar los datos recibidos
-        $validatedData = $request->validate([
-            'name' => 'string|max:255',
-            'email' => 'email|unique:users,email,' . $id,
-            'password' => 'nullable|string|min:8',
+         $request->validate([
+            'name' => 'nullable|string|max:255',
+            
         ]);
 
-        // Encontrar al jugador por ID
-        $player = User::find($id);
-        if (!$player) {
-            return response()->json(['message' => 'Player not found'], 404);
+        $newName = empty($request->name) ? 'anónimo' : $request->name;
+
+        if($newName !== 'anónimo') {
+            $existingUser = User::where('name', $newName)->first();
+            if ($existingUser && $existingUser->id !== $userToUpdate->id) {
+                return response()->json([
+                    'message' => 'The name is already in use. Please choose another one.'
+                ], 400);
+            }
+            $request->validate([
+                'name' => 'unique:users,name',
+            ]);
         }
 
-        // Actualizar los datos del jugador
-        $player->name = $validatedData['name'] ?? $player->name;
-        $player->email = $validatedData['email'] ?? $player->email;
-        if (isset($validatedData['password'])) {
-            $player->password = Hash::make($validatedData['password']);
-        }
-        $player->save();
+        $userToUpdate->name = $newName;
+        $userToUpdate->save();
 
-        return response()->json(['message' => 'Player updated successfully', 'player' => $player]);
+        return response()->json(['message' => 'Player updated successfully', 'player' => $newName]);
+    
     }
 }
